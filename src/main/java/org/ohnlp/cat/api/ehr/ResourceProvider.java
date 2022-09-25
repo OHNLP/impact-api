@@ -4,7 +4,6 @@ import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.DomainResource;
-import org.hl7.fhir.r4.model.Person;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
 import org.ohnlp.cat.api.criteria.EntityValue;
 
@@ -12,7 +11,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
-public interface EHRResourceProvider extends Serializable {
+public interface ResourceProvider extends Serializable {
 
     void init(Map<String, Object> config);
 

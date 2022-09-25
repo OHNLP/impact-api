@@ -6,14 +6,14 @@ import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.*;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
 import org.ohnlp.cat.api.criteria.EntityValue;
-import org.ohnlp.cat.api.ehr.EHRResourceProvider;
+import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Set;
 
-public class OHDSICDMResourceProvider implements EHRResourceProvider {
+public class OHDSICDMResourceProvider implements ResourceProvider {
 
     private String cdmSchemaName;
 
