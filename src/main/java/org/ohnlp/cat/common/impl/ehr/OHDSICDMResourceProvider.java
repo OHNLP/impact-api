@@ -139,6 +139,11 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         return null; // TODO
     }
 
+    @Override
+    public Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID) {
+        return new Object[] {Long.parseLong(evidenceUID)}; // TODO not all types might be long
+    }
+
     // Row to Resource Mapping functions
     private final SerializableFunction<Row, DomainResource> personMappingFunction = (in) -> {
         String personID = in.getInt64("person_id") + "";
