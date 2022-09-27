@@ -6,12 +6,14 @@ import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.*;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
 import org.ohnlp.cat.api.criteria.EntityValue;
+import org.ohnlp.cat.api.criteria.ValueRelationType;
 import org.ohnlp.cat.api.ehr.ResourceProvider;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Map;
-import java.util.Set;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class OHDSICDMResourceProvider implements ResourceProvider {
 
@@ -135,8 +137,43 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     }
 
     @Override
-    public Set<EntityValue> convertToLocalTerminology(ClinicalEntityType type, EntityValue input) {
-        return null; // TODO
+    public Set<EntityValue> convertToLocalTerminology(Connection conn, ClinicalEntityType type, EntityValue input) {
+        // Only process code values
+        switch (input.getValuePath()) {
+            case CONDITION_CODE:
+            case PROCEDURE_CODE:
+            case MEDICATION_CODE:
+            case OBSERVATION_CODE:
+                break;
+            default:
+                return Collections.singleton(input);
+        }
+        String[] umlsCodes = input.getValues();
+        Set<String> resultCodes = new HashSet<>();
+        // Only EQ and IN operations are supported for _CODE paths, so we can just flat expand
+        // the resulting values
+        try {
+            PreparedStatement lookupPS = conn.prepareStatement("SELECT concept_id FROM cdm.CONCEPT WHERE concept_code = ?");
+            for (String s : umlsCodes) {
+                lookupPS.setString(1, s.toUpperCase(Locale.ROOT));
+                ResultSet rs = lookupPS.executeQuery();
+                while (rs.next()) {
+                    resultCodes.add(rs.getInt("concept_id") + "");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e); // TODO
+        }
+        if (resultCodes.size() == 0) {
+            throw new RuntimeException("Vocab expansion resulted in 0 terms!"); // TODO
+        }
+        EntityValue val = new EntityValue();
+        val.setValuePath(input.getValuePath());
+        val.setType(input.getType());
+        val.setValues(resultCodes.toArray(new String[0]));
+        val.setReln(resultCodes.size() > 1? ValueRelationType.IN : ValueRelationType.EQ);
+        return Collections.singleton(val);
     }
 
     @Override

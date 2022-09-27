@@ -8,6 +8,7 @@ import org.ohnlp.cat.api.criteria.ClinicalEntityType;
 import org.ohnlp.cat.api.criteria.EntityValue;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public interface ResourceProvider extends Serializable {
 
     SerializableFunction<Row, DomainResource> getRowToResourceMapper(ClinicalEntityType type);
 
-    Set<EntityValue> convertToLocalTerminology(ClinicalEntityType type, EntityValue input);
+    Set<EntityValue> convertToLocalTerminology(Connection conn, ClinicalEntityType type, EntityValue input);
 
     Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID);
 }
