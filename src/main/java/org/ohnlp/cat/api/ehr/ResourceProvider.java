@@ -31,7 +31,7 @@ public interface ResourceProvider extends Serializable {
 
     SerializableFunction<Row, DomainResource> getRowToResourceMapper(ClinicalEntityType type);
 
-    Set<EntityValue> convertToLocalTerminology(Connection conn, ClinicalEntityType type, EntityValue input);
+    Set<EntityValue> convertToLocalTerminology(ClinicalEntityType type, EntityValue input);
 
     Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID);
 }

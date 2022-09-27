@@ -18,6 +18,7 @@ import java.util.*;
 public class OHDSICDMResourceProvider implements ResourceProvider {
 
     private String cdmSchemaName;
+    private Connection conn;
 
     @Override
     public void init(Map<String, Object> config) {
@@ -137,7 +138,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     }
 
     @Override
-    public Set<EntityValue> convertToLocalTerminology(Connection conn, ClinicalEntityType type, EntityValue input) {
+    public Set<EntityValue> convertToLocalTerminology(ClinicalEntityType type, EntityValue input) {
         // Only process code values
         switch (input.getValuePath()) {
             case CONDITION_CODE:
