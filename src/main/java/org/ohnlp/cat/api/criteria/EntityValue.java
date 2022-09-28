@@ -18,6 +18,7 @@ public class EntityValue {
     private ValueRelationType type;
     private String[] values;
     private ValueRelationType reln;
+    private String[][] expandedCodes;
     // Transient Variables used for value matching
     private transient FhirContext internalContext = FhirContext.forR4Cached();
     private transient ThreadLocal<SimpleDateFormat> sdf;
@@ -70,11 +71,13 @@ public class EntityValue {
             return compareDates(sdf.get().parse(value));
         } catch (ParseException ignored) {
         }
-        // Finally, do a direct string compare
+        // Finally, do a direct string compare.
+        // Here, we need to check if this is a coded/valueset-based comparison first, as in such cases
+        // we ignore values and go directly for expandedCodes
         if (reln.equals(ValueRelationType.IN)) {
-            return Arrays.stream(values).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            return Arrays.stream(expandedCodes).flatMap(Arrays::stream).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
         } else if (reln.equals(ValueRelationType.EQ)) {
-            return value.equalsIgnoreCase(values[0]); // TODO there might be some value in allowing for case sensitive matches
+            return Arrays.stream(expandedCodes[0]).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
         } else {
             throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
         }
