@@ -150,29 +150,16 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     }
 
     @Override
-    public Set<EntityValue> convertToLocalTerminology(ClinicalEntityType type, EntityValue input) {
-        // Only process code values
-        switch (input.getValuePath()) {
-            case CONDITION_CODE:
-            case PROCEDURE_CODE:
-            case MEDICATION_CODE:
-            case OBSERVATION_CODE:
-                break;
-            default:
-                return Collections.singleton(input);
-        }
-        String[] umlsCodes = input.getValues();
+    public Set<String> convertToLocalTerminology(ClinicalEntityType type, String input) {
         Set<String> resultCodes = new HashSet<>();
         // Only EQ and IN operations are supported for _CODE paths, so we can just flat expand
         // the resulting values
         try {
             PreparedStatement lookupPS = conn.prepareStatement("SELECT concept_id FROM cdm.CONCEPT WHERE concept_code = ?");
-            for (String s : umlsCodes) {
-                lookupPS.setString(1, s.toUpperCase(Locale.ROOT));
-                ResultSet rs = lookupPS.executeQuery();
-                while (rs.next()) {
-                    resultCodes.add(rs.getInt("concept_id") + "");
-                }
+            lookupPS.setString(1, input.toUpperCase(Locale.ROOT));
+            ResultSet rs = lookupPS.executeQuery();
+            while (rs.next()) {
+                resultCodes.add(rs.getInt("concept_id") + "");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -181,12 +168,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         if (resultCodes.size() == 0) {
             throw new RuntimeException("Vocab expansion resulted in 0 terms!"); // TODO
         }
-        EntityValue val = new EntityValue();
-        val.setValuePath(input.getValuePath());
-        val.setType(input.getType());
-        val.setValues(resultCodes.toArray(new String[0]));
-        val.setReln(resultCodes.size() > 1? ValueRelationType.IN : ValueRelationType.EQ);
-        return Collections.singleton(val);
+        return resultCodes;
     }
 
     @Override
