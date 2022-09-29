@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 public class EntityValue {
     private FHIRValueLocationPath valuePath;
-    private ValueRelationType type;
     private String[] values;
     private ValueRelationType reln;
     private String[][] expandedCodes;
@@ -145,14 +144,6 @@ public class EntityValue {
 
     public void setValuePath(FHIRValueLocationPath valuePath) {
         this.valuePath = valuePath;
-    }
-
-    public ValueRelationType getType() {
-        return type;
-    }
-
-    public void setType(ValueRelationType type) {
-        this.type = type;
     }
 
     public String[] getValues() {
