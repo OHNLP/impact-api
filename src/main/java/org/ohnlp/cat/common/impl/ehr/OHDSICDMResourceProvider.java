@@ -44,7 +44,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
                         "c.concept_name," +
                         "co.condition_start_date FROM " +
                         cdmSchemaName + ".condition_occurrence co JOIN " + cdmSchemaName + ".concept c " +
-                        "ON co.condition_occurrence_id = c.concept_id";
+                        "ON co.condition_concept_id = c.concept_id";
             case PROCEDURE:
                 return "SELECT p.procedure_occurrence_id, " +
                         "p.person_id, " +
@@ -52,7 +52,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
                         "c.concept_name, " +
                         "p.procedure_date FROM " +
                         cdmSchemaName + ".procedure_occurrence p JOIN " + cdmSchemaName + ".concept c " +
-                        "ON p.procedure_occurrence_id = c.concept_id";
+                        "ON p.procedure_concept_id = c.concept_id";
             case MEDICATION:
                 return "SELECT d.drug_exposure_id, " +
                         "d.person_id, " +
