@@ -63,15 +63,15 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
                         cdmSchemaName + ".drug_exposure d JOIN " + cdmSchemaName + ".concept c " +
                         "ON d.drug_concept_id = c.concept_id";
             case OBSERVATION:
-                return "SELECT o.observation_id, " +
-                        "o.person_id, " +
-                        "o.observation_concept_id, " +
+                return "SELECT m.measurement_id, " +
+                        "m.person_id, " +
+                        "m.measurement_concept_id, " +
                         "c.concept_name, " +
-                        "o.observation_date," +
-                        "o.value_as_number," +
-                        "o.value_as_string FROM " +
-                        cdmSchemaName + ".observation o JOIN " + cdmSchemaName + ".concept c " +
-                        "ON o.observation_concept_id = c.concept_id";
+                        "m.measurement_date," +
+                        "m.value_as_number," +
+                        "m.value_as_concept_id FROM " +
+                        cdmSchemaName + ".measurement m JOIN " + cdmSchemaName + ".concept c " +
+                        "ON m.measurement_concept_id = c.concept_id";
             default:
                 throw new UnsupportedOperationException("Unknown clinical entity type " + type);
         }
@@ -107,7 +107,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
             case MEDICATION:
                 return "drug_exposure_id = ?";
             case OBSERVATION:
-                return "observation_id = ?";
+                return "measurement_id = ?";
             default:
                 throw new UnsupportedOperationException("Unknown clinical entity type " + type);
         }
@@ -125,7 +125,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
             case MEDICATION:
                 return "drug_exposure_id";
             case OBSERVATION:
-                return "observation_id";
+                return "measurement_id";
             default:
                 throw new UnsupportedOperationException("Unknown clinical entity type " + type);
         }
@@ -270,10 +270,10 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> observationMappingFunction = (in) -> {
-        String recordID = in.getInt64("observation_id") + "";
+        String recordID = in.getInt64("measurement_id") + "";
         String personID = in.getInt64("person_id") + "";
-        String conceptID = in.getInt32("observation_concept_id") + "";
-        Date dtm = new Date(in.getDateTime("observation_date").getMillis());
+        String conceptID = in.getInt32("measurement_concept_id") + "";
+        Date dtm = new Date(in.getDateTime("measurement_date").getMillis());
         Observation obs = new Observation();
         obs.setId(ClinicalEntityType.OBSERVATION + ":" + recordID);
         obs.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
@@ -288,7 +288,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         if (in.getFloat("value_as_number") != null) {
             value = in.getFloat("value_as_number") + "";
         } else {
-            value = in.getString("value_as_string");
+            value = in.getString("value_as_concept_id");
             if (value != null && value.trim().length() == 0) {
                 value = null;
             }
@@ -338,12 +338,12 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
             ).build();
     private final Schema observationSchema = Schema.builder()
             .addFields(
-                    Schema.Field.of("observation_id", Schema.FieldType.INT64),
+                    Schema.Field.of("measurement_id", Schema.FieldType.INT64),
                     Schema.Field.of("person_id", Schema.FieldType.INT64),
-                    Schema.Field.of("observation_concept_id", Schema.FieldType.INT32),
+                    Schema.Field.of("measurement_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("concept_name", Schema.FieldType.STRING),
-                    Schema.Field.of("observation_date", Schema.FieldType.DATETIME),
+                    Schema.Field.of("measurement_date", Schema.FieldType.DATETIME),
                     Schema.Field.of("value_as_number", Schema.FieldType.FLOAT),
-                    Schema.Field.of("value_as_string", Schema.FieldType.STRING)
+                    Schema.Field.of("value_as_concept_id", Schema.FieldType.STRING)
             ).build();
 }
