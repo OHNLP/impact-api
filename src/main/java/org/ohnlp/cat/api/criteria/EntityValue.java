@@ -161,4 +161,12 @@ public class EntityValue {
     public void setReln(ValueRelationType reln) {
         this.reln = reln;
     }
+
+    public String[][] getExpandedCodes() {
+        return expandedCodes;
+    }
+
+    public void setExpandedCodes(String[][] expandedCodes) {
+        this.expandedCodes = expandedCodes;
+    }
 }
