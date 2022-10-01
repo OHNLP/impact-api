@@ -8,6 +8,8 @@ public class CandidateScore implements Serializable {
     private Set<String> evidenceIDs;
     private Double score;
 
+    private int dataSourceCount = 1;
+
     public CandidateScore() {}
 
     public CandidateScore(String patientUID, Double score, Set<String> evidenceIDs) {
@@ -38,5 +40,13 @@ public class CandidateScore implements Serializable {
 
     public void setEvidenceIDs(Set<String> evidenceIDs) {
         this.evidenceIDs = evidenceIDs;
+    }
+
+    public int getDataSourceCount() {
+        return dataSourceCount;
+    }
+
+    public void setDataSourceCount(int dataSourceCount) {
+        this.dataSourceCount = dataSourceCount;
     }
 }

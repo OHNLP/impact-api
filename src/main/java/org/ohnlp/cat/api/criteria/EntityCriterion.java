@@ -47,6 +47,8 @@ public class EntityCriterion extends Criterion {
 
     @Override
     public double score(Map<UUID, CandidateScore> scoreByCriterionUID) {
-        return scoreByCriterionUID.containsKey(getNodeUID()) ? scoreByCriterionUID.get(getNodeUID()).getScore() : 0.00;
+        return scoreByCriterionUID.containsKey(getNodeUID()) ?
+                scoreByCriterionUID.get(getNodeUID()).getScore()/scoreByCriterionUID.get(getNodeUID()).getDataSourceCount()
+                : 0.00;
     }
 }
