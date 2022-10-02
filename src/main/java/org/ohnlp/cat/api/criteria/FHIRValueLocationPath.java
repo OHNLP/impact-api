@@ -1,6 +1,8 @@
 package org.ohnlp.cat.api.criteria;
 
-public enum FHIRValueLocationPath {
+import java.io.Serializable;
+
+public enum FHIRValueLocationPath implements Serializable {
     PERSON_ID("identifier"),
     PERSON_GENDER("gender"),
     PERSON_DOB("birthDate"),

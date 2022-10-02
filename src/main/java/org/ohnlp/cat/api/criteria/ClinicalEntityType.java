@@ -1,6 +1,8 @@
 package org.ohnlp.cat.api.criteria;
 
-public enum ClinicalEntityType {
+import java.io.Serializable;
+
+public enum ClinicalEntityType implements Serializable {
     PERSON,
     CONDITION,
     PROCEDURE,

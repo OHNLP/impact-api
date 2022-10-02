@@ -1,6 +1,8 @@
 package org.ohnlp.cat.api.cohorts;
 
-public class CohortCandidate {
+import java.io.Serializable;
+
+public class CohortCandidate implements Serializable {
     private String patUID;
     private CandidateInclusion inclusion;
 

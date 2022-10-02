@@ -1,6 +1,8 @@
 package org.ohnlp.cat.api.evidence;
 
-public class Evidence {
+import java.io.Serializable;
+
+public class Evidence implements Serializable {
     private String evidenceUID;
     private double score;
 
