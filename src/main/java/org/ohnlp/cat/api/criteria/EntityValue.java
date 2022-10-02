@@ -83,12 +83,22 @@ public class EntityValue implements Serializable {
         // Finally, do a direct string compare.
         // Here, we need to check if this is a coded/valueset-based comparison first, as in such cases
         // we ignore values and go directly for expandedCodes
-        if (reln.equals(ValueRelationType.IN)) {
-            return Arrays.stream(expandedCodes).flatMap(Arrays::stream).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
-        } else if (reln.equals(ValueRelationType.EQ)) {
-            return Arrays.stream(expandedCodes[0]).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+        if (valuePath.isCoded()) {
+            if (reln.equals(ValueRelationType.IN)) {
+                return Arrays.stream(expandedCodes).flatMap(Arrays::stream).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            } else if (reln.equals(ValueRelationType.EQ)) {
+                return Arrays.stream(expandedCodes[0]).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            } else {
+                throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
+            }
         } else {
-            throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
+            if (reln.equals(ValueRelationType.IN)) {
+                return Arrays.stream(values).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            } else if (reln.equals(ValueRelationType.EQ)) {
+                return values[0].equalsIgnoreCase(value.toLowerCase(Locale.ROOT));
+            } else {
+                throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
+            }
         }
     }
 
