@@ -178,7 +178,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
 
     // Row to Resource Mapping functions
     private final SerializableFunction<Row, DomainResource> personMappingFunction = (in) -> {
-        String personID = in.getInt64("person_id") + "";
+        String personID = in.getInt32("person_id") + "";
         int genderConceptId = in.getInt32("gender_concept_id");
         int birthyr = in.getInt32("year_of_birth");
         int birthmnth = in.getInt32("month_of_birth");
@@ -212,8 +212,8 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> conditionMappingFunction = (in) -> {
-        String recordID = in.getInt64("condition_occurrence_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("condition_occurrence_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String conditionConceptID = in.getInt32("condition_concept_id") + "";
         Date dtm = new Date(in.getDateTime("condition_start_date").getMillis());
         Condition cdn = new Condition();
@@ -231,8 +231,8 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> medicationMappingFunction = (in) -> {
-        String recordID = in.getInt64("drug_exposure_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("drug_exposure_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String drugConceptId = in.getInt32("drug_concept_id") + "";
         Date dtm = new Date(in.getDateTime("drug_exposure_start_date").getMillis());
         // TODO see about mapping date ends? there doesn't seem to currently be a target in FHIR somehow (or am just blind)
@@ -251,8 +251,8 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> procedureMappingFUnction = (in) -> {
-        String recordID = in.getInt64("procedure_occurrence_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("procedure_occurrence_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String conceptID = in.getInt32("procedure_concept_id") + "";
         Date dtm = new Date(in.getDateTime("procedure_date").getMillis());
         Procedure prc = new Procedure();
@@ -270,8 +270,8 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> observationMappingFunction = (in) -> {
-        String recordID = in.getInt64("measurement_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("measurement_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String conceptID = in.getInt32("measurement_concept_id") + "";
         Date dtm = new Date(in.getDateTime("measurement_date").getMillis());
         Observation obs = new Observation();
@@ -303,7 +303,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     // Individual query result schemas
     private final Schema personSchema = Schema.builder()
             .addFields(
-                    Schema.Field.of("person_id", Schema.FieldType.INT64),
+                    Schema.Field.of("person_id", Schema.FieldType.INT32),
                     Schema.Field.of("gender_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("year_of_birth", Schema.FieldType.INT32),
                     Schema.Field.of("month_of_birth", Schema.FieldType.INT32),
@@ -313,16 +313,16 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
             ).build();
     private final Schema conditionSchema = Schema.builder()
             .addFields(
-                    Schema.Field.of("condition_occurrence_id", Schema.FieldType.INT64),
-                    Schema.Field.of("person_id", Schema.FieldType.INT64),
+                    Schema.Field.of("condition_occurrence_id", Schema.FieldType.INT32),
+                    Schema.Field.of("person_id", Schema.FieldType.INT32),
                     Schema.Field.of("condition_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("concept_name", Schema.FieldType.STRING),
                     Schema.Field.of("condition_start_date", Schema.FieldType.DATETIME)
             ).build();
     private final Schema medicationSchema = Schema.builder()
             .addFields(
-                    Schema.Field.of("drug_exposure_id", Schema.FieldType.INT64),
-                    Schema.Field.of("person_id", Schema.FieldType.INT64),
+                    Schema.Field.of("drug_exposure_id", Schema.FieldType.INT32),
+                    Schema.Field.of("person_id", Schema.FieldType.INT32),
                     Schema.Field.of("drug_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("concept_name", Schema.FieldType.STRING),
                     Schema.Field.of("drug_exposure_start_date", Schema.FieldType.DATETIME),
@@ -330,16 +330,16 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
             ).build();
     private final Schema procedureSchema = Schema.builder()
             .addFields(
-                    Schema.Field.of("procedure_occurrence_id", Schema.FieldType.INT64),
-                    Schema.Field.of("person_id", Schema.FieldType.INT64),
+                    Schema.Field.of("procedure_occurrence_id", Schema.FieldType.INT32),
+                    Schema.Field.of("person_id", Schema.FieldType.INT32),
                     Schema.Field.of("procedure_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("concept_name", Schema.FieldType.STRING),
                     Schema.Field.of("procedure_date", Schema.FieldType.DATETIME)
             ).build();
     private final Schema observationSchema = Schema.builder()
             .addFields(
-                    Schema.Field.of("measurement_id", Schema.FieldType.INT64),
-                    Schema.Field.of("person_id", Schema.FieldType.INT64),
+                    Schema.Field.of("measurement_id", Schema.FieldType.INT32),
+                    Schema.Field.of("person_id", Schema.FieldType.INT32),
                     Schema.Field.of("measurement_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("concept_name", Schema.FieldType.STRING),
                     Schema.Field.of("measurement_date", Schema.FieldType.DATETIME),
