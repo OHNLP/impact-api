@@ -343,7 +343,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
                     Schema.Field.of("measurement_concept_id", Schema.FieldType.INT32),
                     Schema.Field.of("concept_name", Schema.FieldType.STRING),
                     Schema.Field.of("measurement_date", Schema.FieldType.DATETIME),
-                    Schema.Field.of("value_as_number", Schema.FieldType.FLOAT),
-                    Schema.Field.of("value_as_concept_id", Schema.FieldType.STRING)
+                    Schema.Field.of("value_as_number", Schema.FieldType.FLOAT.withNullable(true)),
+                    Schema.Field.of("value_as_concept_id", Schema.FieldType.STRING.withNullable(true))
             ).build();
 }
