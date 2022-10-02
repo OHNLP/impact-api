@@ -20,12 +20,21 @@ public class EntityValue implements Serializable {
     private ValueRelationType reln;
     private String[][] expandedCodes;
     // Transient Variables used for value matching
-    private transient FhirContext internalContext = FhirContext.forR4Cached();
+    private transient FhirContext internalContext;
     private transient ThreadLocal<SimpleDateFormat> sdf;
     private transient ThreadLocal<ObjectMapper> om;
 
     // Logic used to evaluate whether a given value definition matches the provided domain resource
     public boolean matches(DomainResource resource) {
+        if (internalContext == null) {
+            internalContext = FhirContext.forR4();
+        }
+        if (sdf == null) {
+            sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+        }
+        if (om == null) {
+            om = ThreadLocal.withInitial(ObjectMapper::new);
+        }
         String resourceJSON = internalContext.newJsonParser().encodeResourceToString(resource);
         LinkedList<String> pathStack = new LinkedList<>(Arrays.asList(valuePath.getPath().split("\\.")));
         List<String> valueList = new ArrayList<>();
