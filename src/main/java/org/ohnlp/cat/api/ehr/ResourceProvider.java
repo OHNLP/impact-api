@@ -13,11 +13,11 @@ import java.util.Set;
 /**
  * Contains implementation required to FHIR resources from a data source.
  * <p>
- * Produced resources are expected to possess ID tags of the format (nlp:)?clinical_entity_type:evidence_uid
+ * Produced resources are expected to possess ID tags of the format source_system_name:type:evidence_uid
  */
 public interface ResourceProvider extends Serializable {
 
-    void init(Map<String, Object> config);
+    void init(String sourceName, Map<String, Object> config);
 
     String getQuery(ClinicalEntityType type);
 

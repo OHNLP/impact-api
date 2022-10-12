@@ -11,9 +11,11 @@ import java.util.*;
 
 public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     private String cdmSchemaName;
+    private String sourceName;
 
     @Override
-    public void init(Map<String, Object> config) {
+    public void init(String sourceName, Map<String, Object> config) {
+        this.sourceName = sourceName;
         this.cdmSchemaName = config.getOrDefault("schema", "cdm").toString();
     }
 
@@ -114,7 +116,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String conditionConceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Condition cdn = new Condition();
-        cdn.setId(recordID);
+        cdn.setId(String.join(":", sourceName, ClinicalEntityType.CONDITION.name(), recordID));
         cdn.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         cdn.setCode(
                 new CodeableConcept().addCoding(
@@ -134,7 +136,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         // TODO see about mapping date ends? there doesn't seem to currently be a target in FHIR somehow (or am just blind)
         MedicationStatement ms = new MedicationStatement();
-        ms.setId(recordID);
+        ms.setId(String.join(":", sourceName, ClinicalEntityType.MEDICATION.name(), recordID));
         ms.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         ms.setMedication(
                 new CodeableConcept().addCoding(
@@ -153,7 +155,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Procedure prc = new Procedure();
-        prc.setId(recordID);
+        prc.setId(String.join(":", sourceName, ClinicalEntityType.PROCEDURE.name(), recordID));
         prc.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         prc.setCode(
                 new CodeableConcept().addCoding(
@@ -172,7 +174,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Observation obs = new Observation();
-        obs.setId(recordID);
+        obs.setId(String.join(":", sourceName, ClinicalEntityType.OBSERVATION.name(), recordID));
         obs.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         obs.setCode(
                 new CodeableConcept().addCoding(

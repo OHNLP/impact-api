@@ -5,8 +5,6 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.*;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
-import org.ohnlp.cat.api.criteria.EntityValue;
-import org.ohnlp.cat.api.criteria.ValueRelationType;
 import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.sql.Connection;
@@ -19,9 +17,11 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
 
     private String cdmSchemaName;
     private Connection conn;
+    private String sourceName;
 
     @Override
-    public void init(Map<String, Object> config) {
+    public void init(String sourceName, Map<String, Object> config) {
+        this.sourceName = sourceName;
         this.cdmSchemaName = config.getOrDefault("schema", "cdm").toString();
     }
 
@@ -139,7 +139,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
             case CONDITION:
                 return conditionMappingFunction;
             case PROCEDURE:
-                return procedureMappingFUnction;
+                return procedureMappingFunction;
             case MEDICATION:
                 return medicationMappingFunction;
             case OBSERVATION:
@@ -186,7 +186,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         int raceConceptId = in.getInt32("race_concept_id");
         int ethnicityConceptId = in.getInt32("ethnicity_concept_id");
         Person p = new Person();
-        p.setId(personID);
+        p.setId(String.join(":", sourceName, ClinicalEntityType.PERSON.name(), personID));
         switch (genderConceptId) {
             case 0:
                 p.setGender(Enumerations.AdministrativeGender.NULL);
@@ -217,7 +217,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         String conditionConceptID = in.getInt32("condition_concept_id") + "";
         Date dtm = new Date(in.getDateTime("condition_start_date").getMillis());
         Condition cdn = new Condition();
-        cdn.setId(recordID);
+        cdn.setId(String.join(":", sourceName, ClinicalEntityType.CONDITION.name(), recordID));
         cdn.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         cdn.setCode(
                 new CodeableConcept().addCoding(
@@ -237,7 +237,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         Date dtm = new Date(in.getDateTime("drug_exposure_start_date").getMillis());
         // TODO see about mapping date ends? there doesn't seem to currently be a target in FHIR somehow (or am just blind)
         MedicationStatement ms = new MedicationStatement();
-        ms.setId(recordID);
+        ms.setId(String.join(":", sourceName, ClinicalEntityType.MEDICATION.name(), recordID));
         ms.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         ms.setMedication(
                 new CodeableConcept().addCoding(
@@ -250,13 +250,13 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         return ms;
     };
 
-    private final SerializableFunction<Row, DomainResource> procedureMappingFUnction = (in) -> {
+    private final SerializableFunction<Row, DomainResource> procedureMappingFunction = (in) -> {
         String recordID = in.getInt32("procedure_occurrence_id") + "";
         String personID = in.getInt32("person_id") + "";
         String conceptID = in.getInt32("procedure_concept_id") + "";
         Date dtm = new Date(in.getDateTime("procedure_date").getMillis());
         Procedure prc = new Procedure();
-        prc.setId(recordID);
+        prc.setId(String.join(":", sourceName, ClinicalEntityType.PROCEDURE.name(), recordID));
         prc.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         prc.setCode(
                 new CodeableConcept().addCoding(
@@ -275,7 +275,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("measurement_concept_id") + "";
         Date dtm = new Date(in.getDateTime("measurement_date").getMillis());
         Observation obs = new Observation();
-        obs.setId(recordID);
+        obs.setId(String.join(":", sourceName, ClinicalEntityType.OBSERVATION.name(), recordID));
         obs.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         obs.setCode(
                 new CodeableConcept().addCoding(
