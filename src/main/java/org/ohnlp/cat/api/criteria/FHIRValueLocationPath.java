@@ -10,7 +10,7 @@ public enum FHIRValueLocationPath implements Serializable {
     PROCEDURE_CODE("code.coding.code", true),
     MEDICATION_CODE("medicationCodeableConcept.coding.code", true),
     OBSERVATION_CODE("code.coding.code", true),
-    OBSERVATION_VALUE("value.value");
+    OBSERVATION_VALUE("valueString");
 
     private final String path;
     private final boolean coded;
