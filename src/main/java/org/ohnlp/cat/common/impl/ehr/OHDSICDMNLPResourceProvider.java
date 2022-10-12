@@ -23,9 +23,9 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                 "n.person_id, n.note_id, n.note_date, " +
                 "nlp.snippet, nlp.lexical_variant " +
                 "FROM " + cdmSchemaName + ".NOTE n JOIN " + cdmSchemaName + ".NOTE_NLP nlp " +
-                "ON n.note_id = nlp.note_id " +
+                "ON n.note_id = nlp.note_id AND nlp.term_exists = 'Y' " +
                 "JOIN " + cdmSchemaName + ".CONCEPT c " +
-                "ON nlp.note_nlp_concept_id = c.concept_id WHERE domain_id = ";
+                "ON nlp.note_nlp_concept_id = c.concept_id WHERE c.domain_id = ";
         String domainID;
         switch (type) {
             case PERSON:
@@ -114,7 +114,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String conditionConceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Condition cdn = new Condition();
-        cdn.setId("nlp:" + ClinicalEntityType.CONDITION + ":" + recordID + "|" + in.getInt64("note_id"));
+        cdn.setId(recordID);
         cdn.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         cdn.setCode(
                 new CodeableConcept().addCoding(
@@ -134,7 +134,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         // TODO see about mapping date ends? there doesn't seem to currently be a target in FHIR somehow (or am just blind)
         MedicationStatement ms = new MedicationStatement();
-        ms.setId("nlp:" + ClinicalEntityType.MEDICATION + ":" + recordID);
+        ms.setId(recordID);
         ms.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         ms.setMedication(
                 new CodeableConcept().addCoding(
@@ -153,7 +153,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Procedure prc = new Procedure();
-        prc.setId("nlp:" + ClinicalEntityType.PROCEDURE + ":" + recordID);
+        prc.setId(recordID);
         prc.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         prc.setCode(
                 new CodeableConcept().addCoding(
@@ -172,7 +172,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Observation obs = new Observation();
-        obs.setId("nlp:" + ClinicalEntityType.OBSERVATION + ":" + recordID);
+        obs.setId(recordID);
         obs.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         obs.setCode(
                 new CodeableConcept().addCoding(

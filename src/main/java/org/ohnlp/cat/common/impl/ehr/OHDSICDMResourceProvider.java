@@ -186,7 +186,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         int raceConceptId = in.getInt32("race_concept_id");
         int ethnicityConceptId = in.getInt32("ethnicity_concept_id");
         Person p = new Person();
-        p.setId(ClinicalEntityType.PERSON + ":" + personID);
+        p.setId(personID);
         switch (genderConceptId) {
             case 0:
                 p.setGender(Enumerations.AdministrativeGender.NULL);
@@ -217,7 +217,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         String conditionConceptID = in.getInt32("condition_concept_id") + "";
         Date dtm = new Date(in.getDateTime("condition_start_date").getMillis());
         Condition cdn = new Condition();
-        cdn.setId(ClinicalEntityType.CONDITION + ":" + recordID);
+        cdn.setId(recordID);
         cdn.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         cdn.setCode(
                 new CodeableConcept().addCoding(
@@ -237,7 +237,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         Date dtm = new Date(in.getDateTime("drug_exposure_start_date").getMillis());
         // TODO see about mapping date ends? there doesn't seem to currently be a target in FHIR somehow (or am just blind)
         MedicationStatement ms = new MedicationStatement();
-        ms.setId(ClinicalEntityType.MEDICATION + ":" + recordID);
+        ms.setId(recordID);
         ms.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         ms.setMedication(
                 new CodeableConcept().addCoding(
@@ -256,7 +256,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("procedure_concept_id") + "";
         Date dtm = new Date(in.getDateTime("procedure_date").getMillis());
         Procedure prc = new Procedure();
-        prc.setId(ClinicalEntityType.PROCEDURE + ":" + recordID);
+        prc.setId(recordID);
         prc.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         prc.setCode(
                 new CodeableConcept().addCoding(
@@ -275,7 +275,7 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         String conceptID = in.getInt32("measurement_concept_id") + "";
         Date dtm = new Date(in.getDateTime("measurement_date").getMillis());
         Observation obs = new Observation();
-        obs.setId(ClinicalEntityType.OBSERVATION + ":" + recordID);
+        obs.setId(recordID);
         obs.setSubject(new Reference().setIdentifier(new Identifier().setValue(personID)));
         obs.setCode(
                 new CodeableConcept().addCoding(
