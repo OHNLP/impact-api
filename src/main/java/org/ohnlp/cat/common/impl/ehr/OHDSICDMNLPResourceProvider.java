@@ -101,8 +101,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
 
     @Override
     public Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID) {
-        return new Object[] {Long.parseLong(evidenceUID.split("\\|")[0])};
-        // TODO do we want to include note id as well? No performance gain realistically
+        return new Object[] {Long.parseLong(evidenceUID)};
     }
 
     // Row to Resource Mapping functions
