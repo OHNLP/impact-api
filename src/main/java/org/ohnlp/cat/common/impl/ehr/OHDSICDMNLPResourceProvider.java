@@ -57,10 +57,10 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     public Schema getQuerySchema(ClinicalEntityType type) {
         // Schema is the same across all return types
         return Schema.of(
-                Schema.Field.of("note_nlp_id", Schema.FieldType.INT64),
+                Schema.Field.of("note_nlp_id", Schema.FieldType.INT32),
                 Schema.Field.of("concept_name", Schema.FieldType.STRING),
                 Schema.Field.of("note_nlp_concept_id", Schema.FieldType.INT32),
-                Schema.Field.of("person_id", Schema.FieldType.INT64),
+                Schema.Field.of("person_id", Schema.FieldType.INT32),
                 Schema.Field.of("note_id", Schema.FieldType.STRING),
                 Schema.Field.of("note_date", Schema.FieldType.DATETIME),
                 Schema.Field.of("note_text", Schema.FieldType.STRING),
@@ -158,8 +158,8 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> conditionMappingFunction = (in) -> {
-        String recordID = in.getInt64("note_nlp_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("note_nlp_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String conditionConceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Condition cdn = new Condition();
@@ -187,8 +187,8 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> medicationMappingFunction = (in) -> {
-        String recordID = in.getInt64("note_nlp_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("note_nlp_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String drugConceptId = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         // TODO see about mapping date ends? there doesn't seem to currently be a target in FHIR somehow (or am just blind)
@@ -217,8 +217,8 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> procedureMappingFUnction = (in) -> {
-        String recordID = in.getInt64("note_nlp_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("note_nlp_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String conceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Procedure prc = new Procedure();
@@ -246,8 +246,8 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     };
 
     private final SerializableFunction<Row, DomainResource> observationMappingFunction = (in) -> {
-        String recordID = in.getInt64("note_nlp_id") + "";
-        String personID = in.getInt64("person_id") + "";
+        String recordID = in.getInt32("note_nlp_id") + "";
+        String personID = in.getInt32("person_id") + "";
         String conceptID = in.getInt32("note_nlp_concept_id") + "";
         Date dtm = new Date(in.getDateTime("note_date").getMillis());
         Observation obs = new Observation();
