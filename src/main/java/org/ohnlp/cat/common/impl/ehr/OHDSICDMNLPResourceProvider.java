@@ -61,7 +61,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                 Schema.Field.of("concept_name", Schema.FieldType.STRING),
                 Schema.Field.of("note_nlp_concept_id", Schema.FieldType.INT32),
                 Schema.Field.of("person_id", Schema.FieldType.INT64),
-                Schema.Field.of("note_id", Schema.FieldType.INT64),
+                Schema.Field.of("note_id", Schema.FieldType.STRING),
                 Schema.Field.of("note_date", Schema.FieldType.DATETIME),
                 Schema.Field.of("note_text", Schema.FieldType.STRING),
                 Schema.Field.of("offset", Schema.FieldType.STRING),
@@ -175,7 +175,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         cdn.setRecordedDate(dtm);
         cdn.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
 
-        long note_id = in.getInt64("note_id");
+        String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
         docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
@@ -205,7 +205,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         ms.setDateAsserted(dtm);
         ms.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
 
-        long note_id = in.getInt64("note_id");
+        String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
         docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
@@ -234,7 +234,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         prc.setPerformed(new DateTimeType(dtm));
         prc.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
 
-        long note_id = in.getInt64("note_id");
+        String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
         docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
@@ -263,7 +263,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         obs.setIssued(dtm);
         obs.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
 
-        long note_id = in.getInt64("note_id");
+        String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
         docRef.setDate(dtm);
