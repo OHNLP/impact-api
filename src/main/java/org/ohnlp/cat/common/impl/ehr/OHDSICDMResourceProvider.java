@@ -182,6 +182,30 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
         return valueRef.getPath();
     }
 
+    @Override
+    public String extractPatUIDForResource(ClinicalEntityType type, DomainResource r) {
+        switch (type) {
+            case PERSON: {
+                String base = r.getId();
+                // remove source identifier
+                base = base.substring(base.indexOf(":") + 1);
+                // remove type identifier
+                base = base.substring(base.indexOf(":") + 1);
+                return base;
+            }
+            case CONDITION:
+                return ((Condition) r).getSubject().getIdentifier().getValue();
+            case PROCEDURE:
+                return ((Procedure) r).getSubject().getIdentifier().getValue();
+            case MEDICATION:
+                return ((MedicationStatement) r).getSubject().getIdentifier().getValue();
+            case OBSERVATION:
+                return ((Observation) r).getSubject().getIdentifier().getValue();
+            default:
+                throw new UnsupportedOperationException("Unknown entity type " + type);
+        }
+    }
+
     // Row to Resource Mapping functions
     private final SerializableFunction<Row, DomainResource> personMappingFunction = (in) -> {
         String personID = in.getInt32("person_id") + "";

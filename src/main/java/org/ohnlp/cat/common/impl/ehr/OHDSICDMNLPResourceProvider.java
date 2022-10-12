@@ -125,6 +125,33 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         return String.join(".", "contained", valueRef.getPath());
     }
 
+    @Override
+    public String extractPatUIDForResource(ClinicalEntityType type, DomainResource resource) {
+        // First, unbox
+        DomainResource r = (DomainResource) resource.getContained().get(0);
+        // Now find type
+        switch (type) {
+            case PERSON: {
+                String base = r.getId();
+                // remove source identifier
+                base = base.substring(base.indexOf(":") + 1);
+                // remove type identifier
+                base = base.substring(base.indexOf(":") + 1);
+                return base;
+            }
+            case CONDITION:
+                return ((Condition) r).getSubject().getIdentifier().getValue();
+            case PROCEDURE:
+                return ((Procedure) r).getSubject().getIdentifier().getValue();
+            case MEDICATION:
+                return ((MedicationStatement) r).getSubject().getIdentifier().getValue();
+            case OBSERVATION:
+                return ((Observation) r).getSubject().getIdentifier().getValue();
+            default:
+                throw new UnsupportedOperationException("Unknown entity type " + type);
+        }
+    }
+
     // Row to Resource Mapping functions
     private final SerializableFunction<Row, DomainResource> personMappingFunction = (in) -> {
         return new Person(); // There is no person information supported in note_nlp at this time

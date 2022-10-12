@@ -35,4 +35,6 @@ public interface ResourceProvider extends Serializable {
     Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID);
 
     String getPathForValueReference(FHIRValueLocationPath valueRef);
+
+    String extractPatUIDForResource(ClinicalEntityType type, DomainResource resource);
 }
