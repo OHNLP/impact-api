@@ -5,6 +5,7 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.*;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
+import org.ohnlp.cat.api.criteria.FHIRValueLocationPath;
 import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.sql.Connection;
@@ -174,6 +175,11 @@ public class OHDSICDMResourceProvider implements ResourceProvider {
     @Override
     public Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID) {
         return new Object[] {Long.parseLong(evidenceUID)}; // TODO not all types might be long
+    }
+
+    @Override
+    public String getPathForValueReference(FHIRValueLocationPath valueRef) {
+        return valueRef.getPath();
     }
 
     // Row to Resource Mapping functions

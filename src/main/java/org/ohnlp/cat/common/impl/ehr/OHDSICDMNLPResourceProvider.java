@@ -5,8 +5,10 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.*;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
+import org.ohnlp.cat.api.criteria.FHIRValueLocationPath;
 import org.ohnlp.cat.api.ehr.ResourceProvider;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class OHDSICDMNLPResourceProvider implements ResourceProvider {
@@ -23,7 +25,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
     public String getQuery(ClinicalEntityType type) {
         String base = "SELECT nlp.note_nlp_id, c.concept_name, nlp.note_nlp_concept_id" +
                 "n.person_id, n.note_id, n.note_date, " +
-                "nlp.snippet, nlp.lexical_variant " +
+                "n.note_text, nlp.offset, nlp.lexical_variant " +
                 "FROM " + cdmSchemaName + ".NOTE n JOIN " + cdmSchemaName + ".NOTE_NLP nlp " +
                 "ON n.note_id = nlp.note_id AND nlp.term_exists = 'Y' " +
                 "JOIN " + cdmSchemaName + ".CONCEPT c " +
@@ -61,7 +63,8 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                 Schema.Field.of("person_id", Schema.FieldType.INT64),
                 Schema.Field.of("note_id", Schema.FieldType.INT64),
                 Schema.Field.of("note_date", Schema.FieldType.DATETIME),
-                Schema.Field.of("snippet", Schema.FieldType.STRING),
+                Schema.Field.of("note_text", Schema.FieldType.STRING),
+                Schema.Field.of("offset", Schema.FieldType.STRING),
                 Schema.Field.of("lexical_variant", Schema.FieldType.STRING)
         );
     }
@@ -104,6 +107,24 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         return new Object[] {Long.parseLong(evidenceUID)};
     }
 
+    @Override
+    public String getPathForValueReference(FHIRValueLocationPath valueRef) {
+        switch (valueRef) {
+            case PERSON_ID:
+            case PERSON_GENDER:
+            case PERSON_DOB:
+            case CONDITION_CODE:
+            case PROCEDURE_CODE:
+            case MEDICATION_CODE:
+            case OBSERVATION_CODE:
+            case OBSERVATION_VALUE:
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported type " + valueRef);
+        }
+        return String.join(".", "contained", valueRef.getPath());
+    }
+
     // Row to Resource Mapping functions
     private final SerializableFunction<Row, DomainResource> personMappingFunction = (in) -> {
         return new Person(); // There is no person information supported in note_nlp at this time
@@ -125,7 +146,17 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         cdn.setRecordedDate(dtm);
-        return cdn;
+        cdn.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
+
+        long note_id = in.getInt64("note_id");
+        String note_text = in.getString("note_text");
+        DocumentReference docRef = new DocumentReference();
+        docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
+        docRef.setDate(dtm);
+        docRef.setId(String.join(":", sourceName, ClinicalEntityType.CONDITION.name(), recordID));
+        docRef.addContent().setAttachment(new Attachment().setData(note_text.getBytes(StandardCharsets.UTF_8)));
+        docRef.addContained(cdn);
+        return docRef;
     };
 
     private final SerializableFunction<Row, DomainResource> medicationMappingFunction = (in) -> {
@@ -145,7 +176,17 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         ms.setDateAsserted(dtm);
-        return ms;
+        ms.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
+
+        long note_id = in.getInt64("note_id");
+        String note_text = in.getString("note_text");
+        DocumentReference docRef = new DocumentReference();
+        docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
+        docRef.setDate(dtm);
+        docRef.setId(String.join(":", sourceName, ClinicalEntityType.MEDICATION.name(), recordID));
+        docRef.addContent().setAttachment(new Attachment().setData(note_text.getBytes(StandardCharsets.UTF_8)));
+        docRef.addContained(ms);
+        return docRef;
     };
 
     private final SerializableFunction<Row, DomainResource> procedureMappingFUnction = (in) -> {
@@ -164,7 +205,17 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         prc.setPerformed(new DateTimeType(dtm));
-        return prc;
+        prc.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
+
+        long note_id = in.getInt64("note_id");
+        String note_text = in.getString("note_text");
+        DocumentReference docRef = new DocumentReference();
+        docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
+        docRef.setDate(dtm);
+        docRef.setId(String.join(":", sourceName, ClinicalEntityType.PROCEDURE.name(), recordID));
+        docRef.addContent().setAttachment(new Attachment().setData(note_text.getBytes(StandardCharsets.UTF_8)));
+        docRef.addContained(prc);
+        return docRef;
     };
 
     private final SerializableFunction<Row, DomainResource> observationMappingFunction = (in) -> {
@@ -183,6 +234,16 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         obs.setIssued(dtm);
-        return obs;
+        obs.addExtension().setId("nlp_meta").setProperty("offset", new StringType(in.getString("offset")));
+
+        long note_id = in.getInt64("note_id");
+        String note_text = in.getString("note_text");
+        DocumentReference docRef = new DocumentReference();
+        docRef.setDate(dtm);
+        docRef.setMasterIdentifier(new Identifier().setValue(note_id + ""));
+        docRef.setId(String.join(":", sourceName, ClinicalEntityType.OBSERVATION.name(), recordID));
+        docRef.addContent().setAttachment(new Attachment().setData(note_text.getBytes(StandardCharsets.UTF_8)));
+        docRef.addContained(obs);
+        return docRef;
     };
 }
