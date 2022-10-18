@@ -23,7 +23,7 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
 
     @Override
     public String getQuery(ClinicalEntityType type) {
-        String base = "SELECT nlp.note_nlp_id, c.concept_name, nlp.note_nlp_concept_id" +
+        String base = "SELECT nlp.note_nlp_id, c.concept_name, nlp.note_nlp_concept_id, " +
                 "n.person_id, n.note_id, n.note_date, " +
                 "n.note_text, nlp.offset, nlp.lexical_variant " +
                 "FROM " + cdmSchemaName + ".NOTE n JOIN " + cdmSchemaName + ".NOTE_NLP nlp " +
@@ -33,19 +33,19 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
         String domainID;
         switch (type) {
             case PERSON:
-                domainID = "NONE";
+                domainID = "'NONE'";
                 break;
             case CONDITION:
-                domainID = "Condition";
+                domainID = "'Condition'";
                 break;
             case PROCEDURE:
-                domainID = "Procedure";
+                domainID = "'Procedure'";
                 break;
             case MEDICATION:
-                domainID = "Drug";
+                domainID = "'Drug'";
                 break;
             case OBSERVATION:
-                domainID = "Measurement";
+                domainID = "'Measurement'";
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown entity type " + type);
