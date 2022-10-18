@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.hl7.fhir.r4.model.DomainResource;
+import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -25,7 +26,7 @@ public class EntityValue implements Serializable {
     private transient ThreadLocal<ObjectMapper> om;
 
     // Logic used to evaluate whether a given value definition matches the provided domain resource
-    public boolean matches(DomainResource resource) {
+    public boolean matches(DomainResource resource, ResourceProvider provider) {
         if (internalContext == null) {
             internalContext = FhirContext.forR4();
         }
@@ -36,7 +37,7 @@ public class EntityValue implements Serializable {
             om = ThreadLocal.withInitial(ObjectMapper::new);
         }
         String resourceJSON = internalContext.newJsonParser().encodeResourceToString(resource);
-        LinkedList<String> pathStack = new LinkedList<>(Arrays.asList(valuePath.getPath().split("\\.")));
+        LinkedList<String> pathStack = new LinkedList<>(Arrays.asList(provider.getPathForValueReference(valuePath).split("\\.")));
         List<String> valueList = new ArrayList<>();
         try {
             JsonNode json = om.get().readTree(resourceJSON);

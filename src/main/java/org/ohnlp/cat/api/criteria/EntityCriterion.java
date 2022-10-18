@@ -2,6 +2,7 @@ package org.ohnlp.cat.api.criteria;
 
 import org.hl7.fhir.r4.model.DomainResource;
 import org.ohnlp.cat.api.cohorts.CandidateScore;
+import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.util.Map;
 import java.util.UUID;
@@ -36,9 +37,9 @@ public class EntityCriterion extends Criterion {
     }
 
     @Override
-    public boolean matches(DomainResource resource) {
+    public boolean matches(DomainResource resource, ResourceProvider provider) {
         for (EntityValue component : components) {
-            if (!component.matches(resource)) {
+            if (!component.matches(resource, provider)) {
                 return false;
             }
         }
