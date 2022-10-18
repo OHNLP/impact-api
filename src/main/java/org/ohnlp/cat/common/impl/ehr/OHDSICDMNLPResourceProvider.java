@@ -173,10 +173,10 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         cdn.setRecordedDate(dtm);
-        cdn.addExtension().setId("nlp_meta")
-                .setProperty("offset", new StringType(in.getString("offset")))
-                .setProperty("text", new StringType(in.getString("lexical_variant")));
-
+        Extension nlpExtension = cdn.addExtension();
+        nlpExtension.setUrl("nlp:offset").setValue(new StringType(in.getString("offset")));
+        Extension nlpTextExtension = cdn.addExtension();
+        nlpTextExtension.setUrl("nlp:text").setValue(new StringType(in.getString("lexical_variant")));
         String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
@@ -205,9 +205,10 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         ms.setDateAsserted(dtm);
-        ms.addExtension().setId("nlp_meta")
-                .setProperty("offset", new StringType(in.getString("offset")))
-                .setProperty("text", new StringType(in.getString("lexical_variant")));
+        Extension nlpExtension = ms.addExtension();
+        nlpExtension.setUrl("nlp:offset").setValue(new StringType(in.getString("offset")));
+        Extension nlpTextExtension = ms.addExtension();
+        nlpTextExtension.setUrl("nlp:text").setValue(new StringType(in.getString("lexical_variant")));
 
         String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
@@ -236,10 +237,10 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         prc.setPerformed(new DateTimeType(dtm));
-        prc.addExtension().setId("nlp_meta")
-                .setProperty("offset", new StringType(in.getString("offset")))
-                .setProperty("text", new StringType(in.getString("lexical_variant")));
-
+        Extension nlpExtension = prc.addExtension();
+        nlpExtension.setUrl("nlp:offset").setValue(new StringType(in.getString("offset")));
+        Extension nlpTextExtension = prc.addExtension();
+        nlpTextExtension.setUrl("nlp:text").setValue(new StringType(in.getString("lexical_variant")));
         String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
@@ -267,10 +268,10 @@ public class OHDSICDMNLPResourceProvider implements ResourceProvider {
                                 in.getString("concept_name")))
         );
         obs.setIssued(dtm);
-        obs.addExtension().setId("nlp_meta")
-                .setProperty("offset", new StringType(in.getString("offset")))
-                .setProperty("text", new StringType(in.getString("lexical_variant")));
-
+        Extension nlpExtension = obs.addExtension();
+        nlpExtension.setUrl("nlp:offset").setValue(new StringType(in.getString("offset")));
+        Extension nlpTextExtension = obs.addExtension();
+        nlpTextExtension.setUrl("nlp:text").setValue(new StringType(in.getString("lexical_variant")));
         String note_id = in.getString("note_id");
         String note_text = in.getString("note_text");
         DocumentReference docRef = new DocumentReference();
