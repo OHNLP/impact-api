@@ -59,6 +59,7 @@ public class EntityValue implements Serializable {
             for (JsonNode child : json) {
                 findValuesFromJsonPath(child, pathStack, valueList);
             }
+            return;
         }
         if (pathStack.size() > 0) {
             String first = pathStack.removeFirst();
