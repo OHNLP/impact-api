@@ -15,6 +15,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.ohnlp.cat.api.utils.FHIRUtils.findValuesFromJsonPath;
+
 public class EntityValue implements Serializable {
     private FHIRValueLocationPath valuePath;
     private String[] values;
@@ -38,10 +40,10 @@ public class EntityValue implements Serializable {
         }
         String resourceJSON = internalContext.newJsonParser().encodeResourceToString(resource);
         LinkedList<String> pathStack = new LinkedList<>(Arrays.asList(provider.getPathForValueReference(valuePath).split("\\.")));
-        List<String> valueList = new ArrayList<>();
+        List<String> valueList;
         try {
             JsonNode json = om.get().readTree(resourceJSON);
-            findValuesFromJsonPath(json, pathStack, valueList);
+            valueList = findValuesFromJsonPath(json, valuePath.getPath());
         } catch (JsonProcessingException e) {
             return false;
         }
@@ -51,25 +53,6 @@ public class EntityValue implements Serializable {
             }
         }
         return false;
-    }
-
-    private void findValuesFromJsonPath(JsonNode json, LinkedList<String> pathStack, List<String> valueList) {
-        // Just simply always iterate if array
-        if (json instanceof ArrayNode) {
-            for (JsonNode child : json) {
-                findValuesFromJsonPath(child, pathStack, valueList);
-            }
-            return;
-        }
-        if (pathStack.size() > 0) {
-            String first = pathStack.removeFirst();
-            if (json.has(first)) {
-                findValuesFromJsonPath(json.get(first), pathStack, valueList);
-            }
-        } else {
-            // Return current JSON value
-            valueList.add(json.asText());
-        }
     }
 
     private boolean coerceAndCompare(String value) {
