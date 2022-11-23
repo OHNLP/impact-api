@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.hl7.fhir.r4.model.DomainResource;
+import org.ohnlp.cat.api.ehr.ResourceProvider;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -15,19 +17,29 @@ import java.util.stream.Stream;
 
 import static org.ohnlp.cat.api.utils.FHIRUtils.findValuesFromJsonPath;
 
-public class EntityValue {
+public class EntityValue implements Serializable {
     private FHIRValueLocationPath valuePath;
     private String[] values;
     private ValueRelationType reln;
     private String[][] expandedCodes;
     // Transient Variables used for value matching
-    private transient FhirContext internalContext = FhirContext.forR4Cached();
+    private transient FhirContext internalContext;
     private transient ThreadLocal<SimpleDateFormat> sdf;
     private transient ThreadLocal<ObjectMapper> om;
 
     // Logic used to evaluate whether a given value definition matches the provided domain resource
-    public boolean matches(DomainResource resource) {
+    public boolean matches(DomainResource resource, ResourceProvider provider) {
+        if (internalContext == null) {
+            internalContext = FhirContext.forR4();
+        }
+        if (sdf == null) {
+            sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+        }
+        if (om == null) {
+            om = ThreadLocal.withInitial(ObjectMapper::new);
+        }
         String resourceJSON = internalContext.newJsonParser().encodeResourceToString(resource);
+        LinkedList<String> pathStack = new LinkedList<>(Arrays.asList(provider.getPathForValueReference(valuePath).split("\\.")));
         List<String> valueList;
         try {
             JsonNode json = om.get().readTree(resourceJSON);
@@ -56,12 +68,22 @@ public class EntityValue {
         // Finally, do a direct string compare.
         // Here, we need to check if this is a coded/valueset-based comparison first, as in such cases
         // we ignore values and go directly for expandedCodes
-        if (reln.equals(ValueRelationType.IN)) {
-            return Arrays.stream(expandedCodes).flatMap(Arrays::stream).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
-        } else if (reln.equals(ValueRelationType.EQ)) {
-            return Arrays.stream(expandedCodes[0]).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+        if (valuePath.isCoded()) {
+            if (reln.equals(ValueRelationType.IN)) {
+                return Arrays.stream(expandedCodes).flatMap(Arrays::stream).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            } else if (reln.equals(ValueRelationType.EQ)) {
+                return Arrays.stream(expandedCodes[0]).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            } else {
+                throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
+            }
         } else {
-            throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
+            if (reln.equals(ValueRelationType.IN)) {
+                return Arrays.stream(values).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            } else if (reln.equals(ValueRelationType.EQ)) {
+                return values[0].equalsIgnoreCase(value.toLowerCase(Locale.ROOT));
+            } else {
+                throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
+            }
         }
     }
 
@@ -143,5 +165,13 @@ public class EntityValue {
 
     public void setReln(ValueRelationType reln) {
         this.reln = reln;
+    }
+
+    public String[][] getExpandedCodes() {
+        return expandedCodes;
+    }
+
+    public void setExpandedCodes(String[][] expandedCodes) {
+        this.expandedCodes = expandedCodes;
     }
 }

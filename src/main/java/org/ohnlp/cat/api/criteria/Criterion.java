@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonTypeResolver;
 import org.hl7.fhir.r4.model.DomainResource;
 import org.ohnlp.cat.api.cohorts.CandidateScore;
+import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -26,7 +27,7 @@ public abstract class Criterion implements Serializable {
     private String description;
     private String nodeType;
 
-    public abstract boolean matches(DomainResource resource);
+    public abstract boolean matches(DomainResource resource, ResourceProvider resourceProvider);
 
     public abstract double score(Map<UUID, CandidateScore> scoreByCriterionUID);
 

@@ -1,6 +1,8 @@
 package org.ohnlp.cat.api.criteria;
 
-public enum ValueRelationType {
+import java.io.Serializable;
+
+public enum ValueRelationType implements Serializable {
     LT,
     LTE,
     GT,

@@ -27,7 +27,9 @@ public class FHIRUtils {
             for (JsonNode child : json) {
                 findValuesFromJsonPathRecurs(child, pathStack, valueList);
             }
+            return;
         }
+
         if (pathStack.size() > 0) {
             String first = pathStack.removeFirst();
             if (json.has(first)) {

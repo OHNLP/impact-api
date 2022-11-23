@@ -1,14 +1,16 @@
 package org.ohnlp.cat.api.criteria;
 
-public enum FHIRValueLocationPath {
-    PERSON_ID("identifier"),
+import java.io.Serializable;
+
+public enum FHIRValueLocationPath implements Serializable {
+    PERSON_ID("id"),
     PERSON_GENDER("gender"),
     PERSON_DOB("birthDate"),
     CONDITION_CODE("code.coding.code", true),
     PROCEDURE_CODE("code.coding.code", true),
-    MEDICATION_CODE("medication.coding.code", true),
+    MEDICATION_CODE("medicationCodeableConcept.coding.code", true),
     OBSERVATION_CODE("code.coding.code", true),
-    OBSERVATION_VALUE("value.value");
+    OBSERVATION_VALUE("valueString");
 
     private final String path;
     private final boolean coded;

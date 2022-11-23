@@ -1,9 +1,10 @@
 package org.ohnlp.cat.api.jobs;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum JobStatus {
+public enum JobStatus implements Serializable {
     QUEUED(0),
     PREFLIGHT(1),
     IN_PROGRESS(2),

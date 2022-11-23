@@ -5,6 +5,7 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.Row;
 import org.hl7.fhir.r4.model.DomainResource;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
+import org.ohnlp.cat.api.criteria.FHIRValueLocationPath;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -13,11 +14,11 @@ import java.util.Set;
 /**
  * Contains implementation required to FHIR resources from a data source.
  * <p>
- * Produced resources are expected to possess ID tags of the format (nlp:)?clinical_entity_type:evidence_uid
+ * Produced resources are expected to possess ID tags of the format source_system_name:type:evidence_uid
  */
 public interface ResourceProvider extends Serializable {
 
-    void init(Map<String, Object> config);
+    void init(String sourceName, Map<String, Object> config);
 
     String getQuery(ClinicalEntityType type);
 
@@ -32,4 +33,8 @@ public interface ResourceProvider extends Serializable {
     Set<String> convertToLocalTerminology(ClinicalEntityType type, String input);
 
     Object[] parseIDTagToParams(ClinicalEntityType type, String evidenceUID);
+
+    String getPathForValueReference(FHIRValueLocationPath valueRef);
+
+    String extractPatUIDForResource(ClinicalEntityType type, DomainResource resource);
 }

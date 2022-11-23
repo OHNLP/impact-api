@@ -2,6 +2,7 @@ package org.ohnlp.cat.api.criteria;
 
 import org.hl7.fhir.r4.model.DomainResource;
 import org.ohnlp.cat.api.cohorts.CandidateScore;
+import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,11 +42,11 @@ public class LogicalCriterion extends Criterion {
     }
 
     @Override
-    public boolean matches(DomainResource resource) {
+    public boolean matches(DomainResource resource, ResourceProvider provider) {
         switch (type) {
             case AND: {
                 for (Criterion c : children) {
-                    if (!c.matches(resource)) {
+                    if (!c.matches(resource, provider)) {
                         return false;
                     }
                 }
@@ -54,7 +55,7 @@ public class LogicalCriterion extends Criterion {
             case MIN_OR: {
                 int match = 0;
                 for (Criterion val : children) {
-                    if (val.matches(resource)) {
+                    if (val.matches(resource, provider)) {
                         match++;
                         if (match == numericModifier) {
                             return true;
@@ -66,7 +67,7 @@ public class LogicalCriterion extends Criterion {
             case MAX_OR: {
                 int match = 0;
                 for (Criterion val : children) {
-                    if (val.matches(resource)) {
+                    if (val.matches(resource, provider)) {
                         match++;
                         if (match > numericModifier) {
                             return false;
@@ -77,7 +78,7 @@ public class LogicalCriterion extends Criterion {
             }
             case NOT: {
                 for (Criterion c : children) {
-                    if (c.matches(resource)) {
+                    if (c.matches(resource, provider)) {
                         return false;
                     }
                 }

@@ -1,6 +1,8 @@
 package org.ohnlp.cat.api.criteria;
 
-public enum CriterionJudgement {
+import java.io.Serializable;
+
+public enum CriterionJudgement implements Serializable {
     JUDGED_MATCH,
     JUDGED_MISMATCH,
     EVIDENCE_FOUND,

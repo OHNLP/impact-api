@@ -5,14 +5,16 @@ import ca.uhn.fhir.util.FhirTerser;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.Row;
-import org.hl7.fhir.r4.model.DomainResource;
+import org.hl7.fhir.r4.model.*;
 import org.ohnlp.cat.api.criteria.ClinicalEntityType;
+import org.ohnlp.cat.api.criteria.FHIRValueLocationPath;
 import org.ohnlp.cat.api.ehr.ResourceProvider;
 import org.ohnlp.cat.api.utils.FHIRUtils;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class GenericSQLviaJDBCResourceProvider implements ResourceProvider {
 
@@ -20,9 +22,12 @@ public class GenericSQLviaJDBCResourceProvider implements ResourceProvider {
     private Map<ClinicalEntityType, Schema> schemas;
     private Map<ClinicalEntityType, SerializableFunction<Row, DomainResource>> mappingFunctions;
     private Map<ClinicalEntityType, String[]> idCols;
+    private String sourceName;
+
 
     @Override
-    public void init(Map<String, Object> config) {
+    public void init(String sourceName, Map<String, Object> config) {
+        this.sourceName = sourceName;
         this.queries = new HashMap<>();
         this.schemas = new HashMap<>();
         this.mappingFunctions = new HashMap<>();
@@ -52,7 +57,6 @@ public class GenericSQLviaJDBCResourceProvider implements ResourceProvider {
             }
 
         }
-
     }
 
     @Override
@@ -67,13 +71,16 @@ public class GenericSQLviaJDBCResourceProvider implements ResourceProvider {
 
     @Override
     public String getEvidenceIDFilter(ClinicalEntityType type) {
+        if (idCols.get(type) != null) {
+            return Arrays.stream(idCols.get(type)).map(s -> s + " = ?").collect(Collectors.joining(" AND "));
+        }
         return null;
     }
 
     @Override
     public String getIndexableIDColumnName(ClinicalEntityType type) {
-        return null;
-    }
+        return Arrays.stream(idCols.get(type)).collect(Collectors.joining(","));
+    } // TODO investigate where this is actually used to make sure it works for multi-column IDs
 
     @Override
     public SerializableFunction<Row, DomainResource> getRowToResourceMapper(ClinicalEntityType type) {
@@ -138,6 +145,35 @@ public class GenericSQLviaJDBCResourceProvider implements ResourceProvider {
             }
         }
         return ret;
+    }
+
+    @Override
+    public String getPathForValueReference(FHIRValueLocationPath valueRef) {
+        return valueRef.getPath();
+    }
+
+    @Override
+    public String extractPatUIDForResource(ClinicalEntityType type, DomainResource r) { // TODO verify functionality
+        switch (type) {
+            case PERSON: {
+                String base = r.getId();
+                // remove source identifier
+                base = base.substring(base.indexOf(":") + 1);
+                // remove type identifier
+                base = base.substring(base.indexOf(":") + 1);
+                return base;
+            }
+            case CONDITION:
+                return ((Condition) r).getSubject().getIdentifier().getValue();
+            case PROCEDURE:
+                return ((Procedure) r).getSubject().getIdentifier().getValue();
+            case MEDICATION:
+                return ((MedicationStatement) r).getSubject().getIdentifier().getValue();
+            case OBSERVATION:
+                return ((Observation) r).getSubject().getIdentifier().getValue();
+            default:
+                throw new UnsupportedOperationException("Unknown entity type " + type);
+        }
     }
 
     public static class GenericPathBasedMappingFunction implements SerializableFunction<Row, DomainResource> {
