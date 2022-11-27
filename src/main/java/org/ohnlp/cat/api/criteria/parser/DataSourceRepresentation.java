@@ -7,6 +7,7 @@ public class DataSourceRepresentation {
     private String sourceUMLSCUI;
     private String representation;
     private String representationDescription;
+    private String resolverID;
 
     public String getDataSourceID() {
         return dataSourceID;
@@ -40,16 +41,24 @@ public class DataSourceRepresentation {
         this.representationDescription = representationDescription;
     }
 
+    public String getResolverID() {
+        return resolverID;
+    }
+
+    public void setResolverID(String resolverID) {
+        this.resolverID = resolverID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataSourceRepresentation that = (DataSourceRepresentation) o;
-        return Objects.equals(dataSourceID, that.dataSourceID) && Objects.equals(sourceUMLSCUI, that.sourceUMLSCUI) && Objects.equals(representation, that.representation) && Objects.equals(representationDescription, that.representationDescription);
+        return Objects.equals(dataSourceID, that.dataSourceID) && Objects.equals(sourceUMLSCUI, that.sourceUMLSCUI) && Objects.equals(representation, that.representation) && Objects.equals(representationDescription, that.representationDescription) && Objects.equals(resolverID, that.resolverID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dataSourceID, sourceUMLSCUI, representation, representationDescription);
+        return Objects.hash(dataSourceID, sourceUMLSCUI, representation, representationDescription, resolverID);
     }
 }
