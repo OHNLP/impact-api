@@ -7,6 +7,6 @@ import java.util.Set;
 
 public interface UMLSDataSourceRepresentationResolver {
     void init(Map<String, Object> config);
-    Set<DataSourceRepresentation> resolveForUMLS(ClinicalEntityType type, String umlsCUI);
+    Set<DataSourceRepresentation> resolveForUMLS(ClinicalEntityType type, String requestingDataSourceID, String umlsCUI);
 
 }
