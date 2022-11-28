@@ -42,7 +42,7 @@ public class UMLSSourceVocabJDBCResolver implements UMLSDataSourceRepresentation
     }
 
     @Override
-    public Set<DataSourceRepresentation> resolveForUMLS(ClinicalEntityType type, String requestingDataSourceID, String umlsCUI) {
+    public Set<DataSourceRepresentation> resolveForUMLS(ClinicalEntityType type, Collection<String> requestingDataSourceIDs, String umlsCUI) {
         HashSet<DataSourceRepresentation> ret = new HashSet<>();
         List<String> vocabs = sourceVocabMapping.get(type);
         if (vocabs != null) {
@@ -60,7 +60,7 @@ public class UMLSSourceVocabJDBCResolver implements UMLSDataSourceRepresentation
                         representation.setRepresentation(code);
                         representation.setRepresentationDescription(str);
                         representation.setResolverID(vocab);
-                        representation.setDataSourceID(requestingDataSourceID);
+                        representation.setDataSourceID(requestingDataSourceIDs);
                         ret.add(representation);
                     }
                 }
