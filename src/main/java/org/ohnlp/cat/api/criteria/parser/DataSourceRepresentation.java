@@ -3,10 +3,19 @@ package org.ohnlp.cat.api.criteria.parser;
 import java.util.Objects;
 
 public class DataSourceRepresentation {
+    private String dataSourceID;
     private String sourceUMLSCUI;
     private String representation;
     private String representationDescription;
     private String resolverID;
+
+    public String getDataSourceID() {
+        return dataSourceID;
+    }
+
+    public void setDataSourceID(String dataSourceID) {
+        this.dataSourceID = dataSourceID;
+    }
 
     public String getSourceUMLSCUI() {
         return sourceUMLSCUI;
@@ -45,11 +54,11 @@ public class DataSourceRepresentation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataSourceRepresentation that = (DataSourceRepresentation) o;
-        return Objects.equals(sourceUMLSCUI, that.sourceUMLSCUI) && Objects.equals(representation, that.representation) && Objects.equals(representationDescription, that.representationDescription) && Objects.equals(resolverID, that.resolverID);
+        return Objects.equals(dataSourceID, that.dataSourceID) && Objects.equals(sourceUMLSCUI, that.sourceUMLSCUI) && Objects.equals(representation, that.representation) && Objects.equals(representationDescription, that.representationDescription) && Objects.equals(resolverID, that.resolverID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sourceUMLSCUI, representation, representationDescription, resolverID);
+        return Objects.hash(dataSourceID, sourceUMLSCUI, representation, representationDescription, resolverID);
     }
 }
