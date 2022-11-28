@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.hl7.fhir.r4.model.DomainResource;
+import org.ohnlp.cat.api.criteria.parser.DataSourceRepresentation;
 import org.ohnlp.cat.api.ehr.ResourceProvider;
 
 import java.io.Serializable;
@@ -21,7 +22,7 @@ public class EntityValue implements Serializable {
     private FHIRValueLocationPath valuePath;
     private String[] values;
     private ValueRelationType reln;
-    private String[][] expandedCodes;
+    private Collection<DataSourceRepresentation>[] expandedCodes;
     // Transient Variables used for value matching
     private transient FhirContext internalContext;
     private transient ThreadLocal<SimpleDateFormat> sdf;
@@ -69,10 +70,13 @@ public class EntityValue implements Serializable {
         // Here, we need to check if this is a coded/valueset-based comparison first, as in such cases
         // we ignore values and go directly for expandedCodes
         if (valuePath.isCoded()) {
-            if (reln.equals(ValueRelationType.IN)) {
-                return Arrays.stream(expandedCodes).flatMap(Arrays::stream).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
-            } else if (reln.equals(ValueRelationType.EQ)) {
-                return Arrays.stream(expandedCodes[0]).map(String::toLowerCase).collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
+            // TODO check if data source matches
+            if (reln.equals(ValueRelationType.IN) || reln.equals(ValueRelationType.EQ)) {
+                return Arrays.stream(expandedCodes)
+                        .flatMap(Collection::stream)
+                        .map(DataSourceRepresentation::getRepresentation)
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toSet()).contains(value.toLowerCase(Locale.ROOT));
             } else {
                 throw new UnsupportedOperationException("Cannot execute " + reln + " on undefined/string datatype");
             }
@@ -167,11 +171,11 @@ public class EntityValue implements Serializable {
         this.reln = reln;
     }
 
-    public String[][] getExpandedCodes() {
+    public Collection<DataSourceRepresentation>[] getExpandedCodes() {
         return expandedCodes;
     }
 
-    public void setExpandedCodes(String[][] expandedCodes) {
+    public void setExpandedCodes(Collection<DataSourceRepresentation>[] expandedCodes) {
         this.expandedCodes = expandedCodes;
     }
 }
