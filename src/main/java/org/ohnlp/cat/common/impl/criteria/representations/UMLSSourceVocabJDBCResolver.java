@@ -60,7 +60,7 @@ public class UMLSSourceVocabJDBCResolver implements UMLSDataSourceRepresentation
                         representation.setRepresentation(code);
                         representation.setRepresentationDescription(str);
                         representation.setResolverID(vocab);
-                        representation.setDataSourceID(requestingDataSourceID);
+                        ret.add(representation);
                     }
                 }
             } catch (SQLException e) {
