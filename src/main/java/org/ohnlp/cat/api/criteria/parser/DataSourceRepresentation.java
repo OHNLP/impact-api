@@ -1,19 +1,20 @@
 package org.ohnlp.cat.api.criteria.parser;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class DataSourceRepresentation {
-    private String dataSourceID;
+    private Collection<String> dataSourceID;
     private String sourceUMLSCUI;
     private String representation;
     private String representationDescription;
     private String resolverID;
 
-    public String getDataSourceID() {
+    public Collection<String> getDataSourceID() {
         return dataSourceID;
     }
 
-    public void setDataSourceID(String dataSourceID) {
+    public void setDataSourceID(Collection<String> dataSourceID) {
         this.dataSourceID = dataSourceID;
     }
 
