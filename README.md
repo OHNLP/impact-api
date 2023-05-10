@@ -1,4 +1,4 @@
-# IMPACT
+# IMPACT-API
 This provides the common interface definitions used throughout the IMPACT project.
 
 ## Building
